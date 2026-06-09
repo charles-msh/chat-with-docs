@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { ChatMessage, MessageSender, URLGroup, LocalFile } from "@/types";
 import ChatInterface from "@/components/ChatInterface";
 import KnowledgeBaseManager from "@/components/KnowledgeBaseManager";
+import { LogOut, User } from "lucide-react";
 
 const INITIAL_URL_GROUPS: URLGroup[] = [
   {
@@ -36,6 +39,10 @@ const INITIAL_URL_GROUPS: URLGroup[] = [
 const MAX_URLS = 20;
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const isLoggedIn = !!session?.user;
+
   const [urlGroups, setUrlGroups] = useState<URLGroup[]>(INITIAL_URL_GROUPS);
   const [activeGroupId, setActiveGroupId] = useState(INITIAL_URL_GROUPS[0].id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,11 +51,57 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+  const [groupsLoaded, setGroupsLoaded] = useState(false);
 
   const activeGroup = urlGroups.find((g) => g.id === activeGroupId);
   const currentUrls = activeGroup?.urls || [];
   const currentFiles = activeGroup?.files || [];
   const docCount = currentUrls.length + currentFiles.length;
+
+  // Load saved groups from Redis on login
+  useEffect(() => {
+    if (!isLoggedIn || groupsLoaded) return;
+    (async () => {
+      try {
+        const res = await fetch("/api/groups");
+        const data = await res.json();
+        if (data.groups && data.groups.length > 0) {
+          const restored: URLGroup[] = data.groups.map(
+            (g: { id: string; name: string; urls: string[]; fileNames?: string[] }) => ({
+              id: g.id,
+              name: g.name,
+              urls: g.urls,
+              files: [],
+            })
+          );
+          setUrlGroups(restored);
+          setActiveGroupId(restored[0].id);
+        }
+      } catch { /* ignore */ }
+      setGroupsLoaded(true);
+    })();
+  }, [isLoggedIn, groupsLoaded]);
+
+  // Auto-save groups to Redis when they change (logged in only)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => {
+    if (!isLoggedIn || !groupsLoaded) return;
+    clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      const toSave = urlGroups.map((g) => ({
+        id: g.id,
+        name: g.name,
+        urls: g.urls,
+        fileNames: g.files.map((f) => f.name),
+      }));
+      fetch("/api/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groups: toSave }),
+      }).catch(() => {});
+    }, 1000);
+    return () => clearTimeout(saveTimerRef.current);
+  }, [urlGroups, isLoggedIn, groupsLoaded]);
 
   // Welcome message on group change
   useEffect(() => {
@@ -206,6 +259,14 @@ export default function Home() {
       ? `"${activeGroup?.name || ""}" 관련 질문을 입력하세요...`
       : "문서 그룹에 URL이나 파일을 추가하여 시작하세요.";
 
+  if (status === "loading") {
+    return (
+      <div className="h-screen w-screen bg-slate-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen w-screen bg-slate-900 flex items-center justify-center overflow-hidden p-0 sm:p-4">
       {/* Background */}
@@ -220,14 +281,58 @@ export default function Home() {
         </div>
 
         {/* Status Bar */}
-        <div className="h-10 px-6 pt-3 bg-white flex justify-between items-center text-[11px] font-bold text-slate-500 select-none z-10 shrink-0 border-b border-slate-100">
+        <div className="h-10 px-4 pt-3 bg-white flex justify-between items-center text-[11px] font-bold text-slate-500 select-none z-10 shrink-0 border-b border-slate-100">
           <span className="font-semibold text-xs text-slate-700">Chat with Docs</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-5 h-2.5 border border-slate-400 rounded p-[1px] flex items-center">
-              <div className="bg-slate-600 h-full w-[80%] rounded-[1px]" />
-            </div>
+          <div className="flex items-center gap-2">
+            {isLoggedIn ? (
+              <>
+                <span className="text-[10px] text-slate-500 font-medium">
+                  {session.user?.name}
+                </span>
+                {session.user?.image ? (
+                  <img
+                    src={session.user.image}
+                    alt=""
+                    className="w-5 h-5 rounded-full border border-slate-200"
+                  />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                    <User size={10} className="text-white" />
+                  </div>
+                )}
+                <button
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  className="p-0.5 text-slate-400 hover:text-red-500 transition-colors"
+                  title="로그아웃"
+                >
+                  <LogOut size={12} />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => router.push("/login")}
+                className="text-[10px] text-blue-600 font-bold hover:underline"
+              >
+                로그인
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Guest banner */}
+        {!isLoggedIn && (
+          <div className="px-3 py-2 bg-amber-50 border-b border-amber-200 flex items-center justify-between">
+            <span className="text-[11px] text-amber-800 font-medium">
+              게스트 모드 — 로그인하면 설정이 저장됩니다
+            </span>
+            <button
+              onClick={() => router.push("/login")}
+              className="text-[10px] text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded border border-amber-300 hover:bg-amber-200 transition-colors"
+            >
+              로그인
+            </button>
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-grow flex flex-col relative overflow-hidden bg-slate-100">
