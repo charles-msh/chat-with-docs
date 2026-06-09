@@ -173,6 +173,15 @@ export default function Home() {
     setMessages((prev) => [...prev, userMsg, placeholderMsg]);
 
     try {
+      // Build conversation history for multi-turn
+      const history = messages
+        .filter((m) => m.sender === MessageSender.USER || m.sender === MessageSender.MODEL)
+        .filter((m) => !m.isLoading)
+        .map((m) => ({
+          role: m.sender === MessageSender.USER ? "user" as const : "model" as const,
+          text: m.text,
+        }));
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,6 +189,7 @@ export default function Home() {
           prompt: query,
           urls: currentUrls,
           files: currentFiles,
+          history,
         }),
       });
       const data = await res.json();
@@ -218,6 +228,17 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAddGroup = (name: string) => {
+    const newId = `group-${Date.now()}`;
+    const newGroup: URLGroup = { id: newId, name, urls: [], files: [] };
+    setUrlGroups((prev) => [...prev, newGroup]);
+    setActiveGroupId(newId);
+  };
+
+  const handleRemoveGroup = (id: string) => {
+    setUrlGroups((prev) => prev.filter((g) => g.id !== id));
   };
 
   const handleAddUrl = (url: string) => {
@@ -359,6 +380,8 @@ export default function Home() {
               onRemoveUrl={handleRemoveUrl}
               onAddFile={handleAddFile}
               onRemoveFile={handleRemoveFile}
+              onAddGroup={handleAddGroup}
+              onRemoveGroup={handleRemoveGroup}
               onClose={() => setSidebarOpen(false)}
               maxUrls={MAX_URLS}
             />

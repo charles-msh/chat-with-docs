@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, Trash2, ChevronDown, X, Upload, File, Globe, HardDrive } from "lucide-react";
+import { Plus, Trash2, ChevronDown, X, Upload, File, Globe, HardDrive, FolderPlus } from "lucide-react";
 import { URLGroup, LocalFile } from "@/types";
 
 interface KnowledgeBaseManagerProps {
@@ -13,6 +13,8 @@ interface KnowledgeBaseManagerProps {
   onRemoveUrl: (url: string) => void;
   onAddFile: (file: LocalFile) => void;
   onRemoveFile: (fileId: string) => void;
+  onAddGroup: (name: string) => void;
+  onRemoveGroup: (id: string) => void;
   onClose: () => void;
   maxUrls: number;
 }
@@ -26,6 +28,8 @@ export default function KnowledgeBaseManager({
   onRemoveUrl,
   onAddFile,
   onRemoveFile,
+  onAddGroup,
+  onRemoveGroup,
   onClose,
   maxUrls,
 }: KnowledgeBaseManagerProps) {
@@ -33,6 +37,8 @@ export default function KnowledgeBaseManager({
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [activeTab, setActiveTab] = useState<"url" | "file">("url");
+  const [showNewGroup, setShowNewGroup] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const urls = activeGroup?.urls || [];
@@ -112,20 +118,76 @@ export default function KnowledgeBaseManager({
         <label className="block text-xs font-bold text-slate-500 mb-1">
           문서 그룹 선택
         </label>
-        <div className="relative w-full">
-          <select
-            value={activeGroupId}
-            onChange={(e) => onSetGroupId(e.target.value)}
-            className="w-full py-2 pl-3 pr-8 appearance-none border border-slate-300 bg-white text-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm outline-none cursor-pointer"
+        <div className="flex items-center gap-1.5">
+          <div className="relative flex-grow">
+            <select
+              value={activeGroupId}
+              onChange={(e) => onSetGroupId(e.target.value)}
+              className="w-full py-2 pl-3 pr-8 appearance-none border border-slate-300 bg-white text-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm outline-none cursor-pointer"
+            >
+              {urlGroups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+          </div>
+          <button
+            onClick={() => setShowNewGroup(!showNewGroup)}
+            className="h-9 w-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center shrink-0 shadow-sm transition-colors"
+            title="새 그룹 추가"
           >
-            {urlGroups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+            <FolderPlus size={16} />
+          </button>
+          {urlGroups.length > 1 && (
+            <button
+              onClick={() => {
+                const next = urlGroups.find((g) => g.id !== activeGroupId);
+                if (next) {
+                  onRemoveGroup(activeGroupId);
+                  onSetGroupId(next.id);
+                }
+              }}
+              className="h-9 w-9 bg-white hover:bg-red-50 text-slate-400 hover:text-red-500 border border-slate-300 rounded-lg flex items-center justify-center shrink-0 transition-colors"
+              title="현재 그룹 삭제"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
         </div>
+
+        {showNewGroup && (
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="text"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+              placeholder="새 그룹 이름"
+              className="flex-grow h-9 px-3 border border-slate-300 bg-white text-slate-800 placeholder-slate-400 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && newGroupName.trim()) {
+                  onAddGroup(newGroupName.trim());
+                  setNewGroupName("");
+                  setShowNewGroup(false);
+                }
+              }}
+            />
+            <button
+              onClick={() => {
+                if (newGroupName.trim()) {
+                  onAddGroup(newGroupName.trim());
+                  setNewGroupName("");
+                  setShowNewGroup(false);
+                }
+              }}
+              disabled={!newGroupName.trim()}
+              className="h-9 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-lg text-xs font-bold shrink-0 transition-colors"
+            >
+              추가
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}

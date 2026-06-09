@@ -10,6 +10,11 @@ const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
 ];
 
+interface HistoryMessage {
+  role: "user" | "model";
+  text: string;
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -19,7 +24,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { prompt, urls, files } = await request.json();
+  const { prompt, urls, files, history } = await request.json();
 
   if (!prompt || typeof prompt !== "string") {
     return Response.json({ error: "prompt가 필요합니다." }, { status: 400 });
@@ -40,6 +45,20 @@ export async function POST(request: NextRequest) {
   }
 
   const hasUrls = Array.isArray(urls) && urls.length > 0;
+
+  // Build multi-turn contents
+  const contents: Content[] = [];
+
+  // Add conversation history (up to 10 recent turns)
+  const recentHistory: HistoryMessage[] = Array.isArray(history) ? history.slice(-20) : [];
+  for (const msg of recentHistory) {
+    contents.push({
+      role: msg.role === "model" ? "model" : "user",
+      parts: [{ text: msg.text }],
+    });
+  }
+
+  // Add current user message with context
   let fullPrompt = prompt + koreanInstruction + fileContext;
   if (hasUrls) {
     fullPrompt += "\n\nRelevant URLs for context:\n" + urls.join("\n");
@@ -57,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const contents: Content[] = [{ role: "user", parts: parts as Content["parts"] }];
+  contents.push({ role: "user", parts: parts as Content["parts"] });
 
   try {
     const response = await ai.models.generateContent({
