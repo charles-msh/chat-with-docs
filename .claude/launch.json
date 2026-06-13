@@ -4,8 +4,9 @@
     {
       "name": "chat-with-docs-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "runtimeArgs": ["run", "dev", "--", "--port", "3001"],
+      "port": 3001,
+      "cwd": "C:\\Users\\Charles\\Desktop\\vibe coding\\chat-with-docs"
     }
   ]
 }
