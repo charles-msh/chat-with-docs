@@ -19,8 +19,11 @@ export default function Home() {
     router.push(`/chat?q=${encodeURIComponent(trimmed)}`);
   };
 
-  const handleExampleClick = (q: string) => {
-    router.push(`/chat?q=${encodeURIComponent(q)}`);
+  const handleExampleClick = (q: string, groupId?: string) => {
+    const params = new URLSearchParams();
+    if (groupId) params.set("group", groupId);
+    params.set("q", q);
+    router.push(`/chat?${params.toString()}`);
   };
 
   return (

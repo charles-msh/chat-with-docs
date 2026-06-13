@@ -8,6 +8,7 @@ interface Example {
   title: string;
   description: string;
   query: string;
+  groupId: string;
 }
 
 const EXAMPLES: Example[] = [
@@ -16,35 +17,40 @@ const EXAMPLES: Example[] = [
     title: "아이폰 뒷면 탭",
     description: "뒷면 탭 동작 설정하는 방법",
     query: "아이폰 뒷면 탭 동작 설정하는 방법을 알려줘",
+    groupId: "pub-iphone",
   },
   {
     emoji: "🚗",
     title: "쏘나타 계기판",
     description: "계기판 화면 변경하는 방법",
     query: "쏘나타 계기판 화면 변경하는 방법을 알려줘",
+    groupId: "pub-sonata",
   },
   {
     emoji: "💻",
     title: "맥북 배터리 관리",
     description: "배터리 수명 늘리는 설정법",
     query: "맥북 배터리 수명을 늘리는 설정 방법을 알려줘",
+    groupId: "pub-macbook",
   },
   {
     emoji: "📺",
     title: "LG TV 미러링",
     description: "스마트폰 화면 연결하기",
     query: "LG TV에 스마트폰 화면 미러링하는 방법을 알려줘",
+    groupId: "pub-lgtv",
   },
   {
     emoji: "🎮",
     title: "PS5 초기 설정",
     description: "처음 구매 후 설정 가이드",
     query: "PS5 처음 구매 후 초기 설정하는 방법을 알려줘",
+    groupId: "pub-ps5",
   },
 ];
 
 interface ExampleCardsProps {
-  onQueryClick: (query: string) => void;
+  onQueryClick: (query: string, groupId?: string) => void;
 }
 
 export default function ExampleCards({ onQueryClick }: ExampleCardsProps) {
@@ -86,7 +92,7 @@ export default function ExampleCards({ onQueryClick }: ExampleCardsProps) {
         {EXAMPLES.map((ex) => (
           <button
             key={ex.title}
-            onClick={() => onQueryClick(ex.query)}
+            onClick={() => onQueryClick(ex.query, ex.groupId)}
             className="snap-start min-w-[160px] max-w-[160px] bg-white border border-slate-200 rounded-2xl p-4 text-left hover:border-blue-300 hover:shadow-sm transition-all active:scale-[0.97] shrink-0"
           >
             <span className="text-2xl block mb-2">{ex.emoji}</span>
