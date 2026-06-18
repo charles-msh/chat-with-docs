@@ -24,7 +24,7 @@ const EXAMPLES: Example[] = [
     title: "쏘나타 계기판",
     description: "계기판 화면 변경하는 방법",
     query: "쏘나타 계기판 화면 변경하는 방법을 알려줘",
-    groupId: "pub-sonata",
+    groupId: "pub-h-sonata",
   },
   {
     emoji: "💻",
