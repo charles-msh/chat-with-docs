@@ -9,8 +9,12 @@ const KB = "https://ownersmanual.kia.com";
 const hm = (name, year, code) => `${HB}/manual/${encodeURIComponent(name)}?langCode=ko_KR&countryCode=A99&year=${year}&projCode=${code}`;
 const km = (name, year, code) => `${KB}/manual/${encodeURIComponent(name)}?langCode=ko_KR&countryCode=A99VA&year=${year}&projCode=${code}`;
 
-const AG = "https://support.apple.com/ko-kr/guide/iphone";
-const ai = (id, ver) => `${AG}/${id}/${ver}/ios/${ver}`;
+const AG = "https://support.apple.com/ko-kr/guide";
+const ai = (id, ver) => `${AG}/iphone/${id}/${ver}/ios/${ver}`;
+const ap = (id, ver) => `${AG}/ipad/${id}/${ver}/ipados/${ver}`;
+const am = (id, ver) => `${AG}/mac-help/${id}/${ver}/mac/${ver}`;
+const aw = (id, ver) => `${AG}/watch/${id}/${ver}/watchos/${ver}`;
+const aa = (id) => `${AG}/airpods/${id}/web`;
 
 async function main() {
   const existing = await r.get("chatdocs:public:groups");
@@ -289,25 +293,146 @@ async function main() {
       ] },
   ];
 
+  // ========== 애플 아이패드 ==========
+  const ipadGroups = [
+    { id: "pub-ipad-26", name: "아이패드 iPadOS 26 사용 설명서", emoji: "📱", category: "애플 아이패드",
+      description: "Apple iPad iPadOS 26 공식 사용 설명서 - 설정, 카메라, 멀티태스킹, Apple Pencil, 키보드, Safari 등",
+      urls: [
+        ap("welcome", "26"), ap("ipadad6ac8d3", "26"), ap("ipad99b53a71", "26"),
+        ap("ipad997da965", "26"), ap("ipad08c9970c", "26"), ap("ipad89415cd5", "26"),
+        ap("ipad4b92bd12", "26"), ap("ipad999d68f9", "26"), ap("ipadba23b9b4", "26"),
+        ap("ipad9a2465f9", "26"), ap("ipad9b4cea76", "26"),
+      ] },
+    { id: "pub-ipad-18", name: "아이패드 iPadOS 18 사용 설명서", emoji: "📱", category: "애플 아이패드",
+      description: "Apple iPad iPadOS 18 공식 사용 설명서 - 설정, 카메라, 멀티태스킹, Apple Pencil, 키보드, Safari 등",
+      urls: [
+        ap("welcome", "18.0"), ap("ipadad6ac8d3", "18.0"), ap("ipad99b53a71", "18.0"),
+        ap("ipad997da965", "18.0"), ap("ipad08c9970c", "18.0"), ap("ipad89415cd5", "18.0"),
+        ap("ipad4b92bd12", "18.0"), ap("ipad999d68f9", "18.0"), ap("ipadba23b9b4", "18.0"),
+        ap("ipad9a2465f9", "18.0"), ap("ipad9b4cea76", "18.0"),
+      ] },
+    { id: "pub-ipad-17", name: "아이패드 iPadOS 17 사용 설명서", emoji: "📱", category: "애플 아이패드",
+      description: "Apple iPad iPadOS 17 공식 사용 설명서 - 설정, 카메라, 멀티태스킹, Apple Pencil, 키보드, Safari 등",
+      urls: [
+        ap("welcome", "17.0"), ap("ipadad6ac8d3", "17.0"), ap("ipad99b53a71", "17.0"),
+        ap("ipad997da965", "17.0"), ap("ipad08c9970c", "17.0"), ap("ipad89415cd5", "17.0"),
+        ap("ipad4b92bd12", "17.0"), ap("ipad999d68f9", "17.0"), ap("ipadba23b9b4", "17.0"),
+        ap("ipad9a2465f9", "17.0"), ap("ipad9b4cea76", "17.0"),
+      ] },
+    { id: "pub-ipad-16", name: "아이패드 iPadOS 16 사용 설명서", emoji: "📱", category: "애플 아이패드",
+      description: "Apple iPad iPadOS 16 공식 사용 설명서 - 설정, 카메라, 멀티태스킹, Apple Pencil, 키보드, Safari 등",
+      urls: [
+        ap("welcome", "16.0"), ap("ipadad6ac8d3", "16.0"), ap("ipad99b53a71", "16.0"),
+        ap("ipad997da965", "16.0"), ap("ipad08c9970c", "16.0"), ap("ipad89415cd5", "16.0"),
+        ap("ipad4b92bd12", "16.0"), ap("ipad999d68f9", "16.0"), ap("ipadba23b9b4", "16.0"),
+        ap("ipad9a2465f9", "16.0"), ap("ipad9b4cea76", "16.0"),
+      ] },
+  ];
+
+  // ========== 애플 맥 ==========
+  const macGroups = [
+    { id: "pub-mac-26", name: "맥 macOS Tahoe 사용 설명서", emoji: "💻", category: "애플 맥",
+      description: "Apple Mac macOS Tahoe 26 공식 사용 설명서 - Finder, Safari, 시스템설정, 단축키, 보안 등",
+      urls: [
+        am("welcome", "26"), am("mchl3a2c2cb0", "26"), am("mchlp2605", "26"),
+        am("ibrw1005", "26"), am("mh15217", "26"), am("mh35848", "26"),
+        am("mchlp2704", "26"), am("mchlp2262", "26"), am("mh35884", "26"),
+        am("flvlt003", "26"), am("mchl110b00b7", "26"),
+      ] },
+    { id: "pub-mac-15", name: "맥 macOS Sequoia 사용 설명서", emoji: "💻", category: "애플 맥",
+      description: "Apple Mac macOS Sequoia 15 공식 사용 설명서 - Finder, Safari, 시스템설정, 단축키, 보안 등",
+      urls: [
+        am("welcome", "15"), am("mchl3a2c2cb0", "15"), am("mchlp2605", "15"),
+        am("ibrw1005", "15"), am("mh15217", "15"), am("mh35848", "15"),
+        am("mchlp2704", "15"), am("mchlp2262", "15"), am("mh35884", "15"),
+        am("flvlt003", "15"), am("mchl110b00b7", "15"),
+      ] },
+    { id: "pub-mac-14", name: "맥 macOS Sonoma 사용 설명서", emoji: "💻", category: "애플 맥",
+      description: "Apple Mac macOS Sonoma 14 공식 사용 설명서 - Finder, Safari, 시스템설정, 단축키, 보안 등",
+      urls: [
+        am("welcome", "14"), am("mchl3a2c2cb0", "14"), am("mchlp2605", "14"),
+        am("ibrw1005", "14"), am("mh15217", "14"), am("mh35848", "14"),
+        am("mchlp2704", "14"), am("mchlp2262", "14"), am("mh35884", "14"),
+        am("flvlt003", "14"), am("mchl110b00b7", "14"),
+      ] },
+    { id: "pub-mac-13", name: "맥 macOS Ventura 사용 설명서", emoji: "💻", category: "애플 맥",
+      description: "Apple Mac macOS Ventura 13 공식 사용 설명서 - Finder, Safari, 시스템설정, 단축키, 보안 등",
+      urls: [
+        am("welcome", "13"), am("mchl3a2c2cb0", "13"), am("mchlp2605", "13"),
+        am("ibrw1005", "13"), am("mh15217", "13"), am("mh35848", "13"),
+        am("mchlp2704", "13"), am("mchlp2262", "13"), am("mh35884", "13"),
+        am("flvlt003", "13"), am("mchl110b00b7", "13"),
+      ] },
+  ];
+
+  // ========== 애플 워치 ==========
+  const watchGroups = [
+    { id: "pub-watch-26", name: "애플워치 watchOS 26 사용 설명서", emoji: "⌚", category: "애플 워치",
+      description: "Apple Watch watchOS 26 공식 사용 설명서 - 건강, 운동, 알림, 워치페이스, Apple Pay 등",
+      urls: [
+        aw("welcome", "26"), aw("apd1456230aa", "26"), aw("apd7941a2f19", "26"),
+        aw("apd4edc9bc20", "26"), aw("apde978ebff5", "26"), aw("apda6559ad78", "26"),
+        aw("apd2b717523a", "26"), aw("apd99e3c6a68", "26"), aw("apdaabc79d3b", "26"),
+        aw("apd285b3ae01", "26"), aw("apdcf848d29e", "26"),
+      ] },
+    { id: "pub-watch-11", name: "애플워치 watchOS 11 사용 설명서", emoji: "⌚", category: "애플 워치",
+      description: "Apple Watch watchOS 11 공식 사용 설명서 - 건강, 운동, 알림, 워치페이스, Apple Pay 등",
+      urls: [
+        aw("welcome", "11"), aw("apd1456230aa", "11"), aw("apd7941a2f19", "11"),
+        aw("apd4edc9bc20", "11"), aw("apde978ebff5", "11"), aw("apda6559ad78", "11"),
+        aw("apd2b717523a", "11"), aw("apd99e3c6a68", "11"), aw("apdaabc79d3b", "11"),
+        aw("apd285b3ae01", "11"), aw("apdcf848d29e", "11"),
+      ] },
+    { id: "pub-watch-10", name: "애플워치 watchOS 10 사용 설명서", emoji: "⌚", category: "애플 워치",
+      description: "Apple Watch watchOS 10 공식 사용 설명서 - 건강, 운동, 알림, 워치페이스, Apple Pay 등",
+      urls: [
+        aw("welcome", "10"), aw("apd1456230aa", "10"), aw("apd7941a2f19", "10"),
+        aw("apd4edc9bc20", "10"), aw("apde978ebff5", "10"), aw("apda6559ad78", "10"),
+        aw("apd2b717523a", "10"), aw("apd99e3c6a68", "10"), aw("apdaabc79d3b", "10"),
+        aw("apd285b3ae01", "10"), aw("apdcf848d29e", "10"),
+      ] },
+    { id: "pub-watch-9", name: "애플워치 watchOS 9 사용 설명서", emoji: "⌚", category: "애플 워치",
+      description: "Apple Watch watchOS 9 공식 사용 설명서 - 건강, 운동, 알림, 워치페이스, Apple Pay 등",
+      urls: [
+        aw("welcome", "9"), aw("apd1456230aa", "9"), aw("apd7941a2f19", "9"),
+        aw("apd4edc9bc20", "9"), aw("apde978ebff5", "9"), aw("apda6559ad78", "9"),
+        aw("apd2b717523a", "9"), aw("apd99e3c6a68", "9"), aw("apdaabc79d3b", "9"),
+        aw("apd285b3ae01", "9"), aw("apdcf848d29e", "9"),
+      ] },
+  ];
+
+  // ========== 애플 에어팟 ==========
+  const airpodsGroups = [
+    { id: "pub-airpods", name: "에어팟 사용 설명서", emoji: "🎧", category: "애플 에어팟",
+      description: "Apple AirPods 공식 사용 설명서 - 페어링, 노이즈캔슬링, 공간음향, 충전, Siri, 나의찾기 등",
+      urls: [
+        aa("welcome"), aa("dev7c85810f2"), aa("devb2c431317"),
+        aa("dev9812f5cc3"), aa("dev00eb7e0a3"), aa("devde25a4bbe"),
+        aa("devc2c0f438a"), aa("dev8e8b93d71"), aa("devec5c64a16"),
+      ] },
+  ];
+
+  const appleGroups = [...iphoneGroups, ...ipadGroups, ...macGroups, ...watchGroups, ...airpodsGroups];
+
   carGroups.forEach((g, i) => {
     g.isFeatured = true;
     g.featuredOrder = 10 + i;
     g.createdAt = now;
   });
-  iphoneGroups.forEach((g, i) => {
+  appleGroups.forEach((g, i) => {
     g.isFeatured = true;
     g.featuredOrder = 100 + i;
     g.createdAt = now;
   });
 
-  const allGroups = [...nonCar, ...carGroups, ...iphoneGroups];
+  const allGroups = [...nonCar, ...carGroups, ...appleGroups];
 
   const hyundai = carGroups.filter(g => g.category.startsWith("현대"));
   const kia = carGroups.filter(g => g.category.startsWith("기아"));
   console.log(`Non-car groups kept: ${nonCar.length}`);
   console.log(`현대: ${hyundai.length}개 그룹, ${hyundai.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`기아: ${kia.length}개 그룹, ${kia.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
-  console.log(`아이폰: ${iphoneGroups.length}개 그룹, ${iphoneGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
+  console.log(`애플: ${appleGroups.length}개 그룹, ${appleGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`Total: ${allGroups.length}개 그룹, ${allGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
 
   await r.set("chatdocs:public:groups", JSON.stringify(allGroups));
