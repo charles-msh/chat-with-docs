@@ -16,10 +16,13 @@ const am = (id, ver) => `${AG}/mac-help/${id}/${ver}/mac/${ver}`;
 const aw = (id, ver) => `${AG}/watch/${id}/${ver}/watchos/${ver}`;
 const aa = (id) => `${AG}/airpods/${id}/web`;
 
+const NS = "https://www.nintendo.co.kr/support/switch";
+const PS = "https://www.playstation.com/ko-kr/support";
+
 async function main() {
   const existing = await r.get("chatdocs:public:groups");
   const old = existing ? (typeof existing === "string" ? JSON.parse(existing) : existing) : [];
-  const nonCar = old.filter(g => ["pub-macbook","pub-lgtv","pub-ps5"].includes(g.id));
+  const nonCar = old.filter(g => ["pub-macbook","pub-lgtv"].includes(g.id));
 
   const now = new Date().toISOString();
   const carGroups = [
@@ -412,20 +415,85 @@ async function main() {
       ] },
   ];
 
-  const appleGroups = [...iphoneGroups, ...ipadGroups, ...macGroups, ...watchGroups, ...airpodsGroups];
+  // ========== 닌텐도 Switch ==========
+  const nintendoGroups = [
+    { id: "pub-switch", name: "닌텐도 Switch 사용 설명서", emoji: "🎮", category: "닌텐도 Switch",
+      description: "Nintendo Switch 공식 사용 설명서 - 초기설정, 조이콘, 인터넷, eShop, 데이터관리, 보호자설정 등",
+      urls: [
+        `${NS}/`,
+        `${NS}/setting/`,
+        `${NS}/controller/`,
+        `${NS}/internet/`,
+        `${NS}/playmode/`,
+        `${NS}/power/`,
+        `${NS}/eshop/`,
+        `${NS}/data_management/`,
+        `${NS}/parentalcontrols/`,
+        `${NS}/user/`,
+        `${NS}/accessories/`,
+      ] },
+  ];
 
-  carGroups.forEach((g, i) => {
+  // ========== PlayStation 5 ==========
+  const ps5Groups = [
+    { id: "pub-ps5-setup", name: "PS5 본체 설정 및 하드웨어", emoji: "🎮", category: "PlayStation 5",
+      description: "PS5 초기 설정, 컨트롤러, SSD 확장, 세이프모드, 전원, 오디오, 디스크 등",
+      urls: [
+        `${PS}/hardware/ps5/`,
+        `${PS}/hardware/ps5-get-started-set-up/`,
+        `${PS}/hardware/pair-dualsense-controller-bluetooth/`,
+        `${PS}/hardware/ps5-install-m2-ssd/`,
+        `${PS}/hardware/ps5-extended-storage/`,
+        `${PS}/hardware/safe-mode-playstation/`,
+        `${PS}/hardware/ps5-ps4-power-indicator-lights/`,
+        `${PS}/hardware/ps5-change-audio-output/`,
+        `${PS}/hardware/3d-audio-ps5/`,
+        `${PS}/hardware/ps5-4k-resolution-guide/`,
+        `${PS}/hardware/ps5-accessibility-settings/`,
+        `${PS}/hardware/ps5-eject-stuck-disc/`,
+      ] },
+    { id: "pub-ps5-games", name: "PS5 게임 및 온라인", emoji: "🎮", category: "PlayStation 5",
+      description: "PS5 리모트플레이, 화면공유, 트로피, 세이브데이터, 방송, 디스코드 등",
+      urls: [
+        `${PS}/games/playstation-remote-play-on-mobile-devices/`,
+        `${PS}/games/playstation-remote-play-on-pc-and-mac/`,
+        `${PS}/games/ps5-share-play/`,
+        `${PS}/games/ps5-share-screen/`,
+        `${PS}/games/ps5-party-voice-chat/`,
+        `${PS}/games/discord-voice-chat/`,
+        `${PS}/games/how-to-earn-trophies-on-playstation--consoles/`,
+        `${PS}/games/capture-ps5-gameplay-screenshots/`,
+        `${PS}/games/upgrade-ps4-game-to-ps5-version/`,
+        `${PS}/games/ps5-backward-compatibility-games/`,
+        `${PS}/hardware/transfer-games-saved-data-ps4-ps5/`,
+      ] },
+    { id: "pub-ps5-account", name: "PS5 계정 및 보안", emoji: "🎮", category: "PlayStation 5",
+      description: "PSN 계정 관리, 2단계 인증, 패밀리 설정, 개인정보, 콘솔 공유 등",
+      urls: [
+        `${PS}/account/create-account/`,
+        `${PS}/account/password-reset/`,
+        `${PS}/account/2sv-psn-login/`,
+        `${PS}/account/set-up-passkey/`,
+        `${PS}/account/ps5-console-sharing-offline-play/`,
+        `${PS}/account/playstation-family-account-set-up/`,
+        `${PS}/account/ps5-parental-controls-spending-limits/`,
+        `${PS}/account/privacy-settings/`,
+        `${PS}/account/change-online-id/`,
+        `${PS}/account/security-best-practice/`,
+      ] },
+  ];
+
+  const gameGroups = [...nintendoGroups, ...ps5Groups];
+  const appleGroups = [...iphoneGroups, ...ipadGroups, ...macGroups, ...watchGroups, ...airpodsGroups];
+  const allNew = [...carGroups, ...appleGroups, ...gameGroups];
+
+  allNew.forEach((g, i) => {
     g.isFeatured = true;
     g.featuredOrder = 10 + i;
     g.createdAt = now;
   });
-  appleGroups.forEach((g, i) => {
-    g.isFeatured = true;
-    g.featuredOrder = 100 + i;
-    g.createdAt = now;
-  });
 
-  const allGroups = [...nonCar, ...carGroups, ...appleGroups];
+  const allGroups = [...nonCar, ...allNew];
 
   const hyundai = carGroups.filter(g => g.category.startsWith("현대"));
   const kia = carGroups.filter(g => g.category.startsWith("기아"));
@@ -433,6 +501,7 @@ async function main() {
   console.log(`현대: ${hyundai.length}개 그룹, ${hyundai.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`기아: ${kia.length}개 그룹, ${kia.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`애플: ${appleGroups.length}개 그룹, ${appleGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
+  console.log(`게임: ${gameGroups.length}개 그룹, ${gameGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`Total: ${allGroups.length}개 그룹, ${allGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
 
   await r.set("chatdocs:public:groups", JSON.stringify(allGroups));

@@ -45,7 +45,7 @@ const EXAMPLES: Example[] = [
     title: "PS5 초기 설정",
     description: "처음 구매 후 설정 가이드",
     query: "PS5 처음 구매 후 초기 설정하는 방법을 알려줘",
-    groupId: "pub-ps5",
+    groupId: "pub-ps5-setup",
   },
 ];
 
