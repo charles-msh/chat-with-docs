@@ -9,10 +9,13 @@ const KB = "https://ownersmanual.kia.com";
 const hm = (name, year, code) => `${HB}/manual/${encodeURIComponent(name)}?langCode=ko_KR&countryCode=A99&year=${year}&projCode=${code}`;
 const km = (name, year, code) => `${KB}/manual/${encodeURIComponent(name)}?langCode=ko_KR&countryCode=A99VA&year=${year}&projCode=${code}`;
 
+const AG = "https://support.apple.com/ko-kr/guide/iphone";
+const ai = (id, ver) => `${AG}/${id}/${ver}/ios/${ver}`;
+
 async function main() {
   const existing = await r.get("chatdocs:public:groups");
   const old = existing ? (typeof existing === "string" ? JSON.parse(existing) : existing) : [];
-  const nonCar = old.filter(g => ["pub-iphone","pub-macbook","pub-lgtv","pub-ps5"].includes(g.id));
+  const nonCar = old.filter(g => ["pub-macbook","pub-lgtv","pub-ps5"].includes(g.id));
 
   const now = new Date().toISOString();
   const carGroups = [
@@ -222,19 +225,89 @@ async function main() {
       urls: [km("타스만", 2027, "TK1")] },
   ];
 
+  // ========== 애플 아이폰 ==========
+  const iphoneGroups = [
+    { id: "pub-iphone-ios26", name: "아이폰 iOS 26 사용 설명서", emoji: "📱", category: "애플 아이폰",
+      description: "Apple iPhone iOS 26 공식 사용 설명서 - 설정, 카메라, 배터리, Safari, Siri, 접근성 등",
+      urls: [
+        ai("welcome", "26"),
+        ai("iph9374b7411", "26"),
+        ai("iph1fd7e482f", "26"),
+        ai("iph263472f78", "26"),
+        ai("iph63eecc618", "26"),
+        ai("iph3d039b67", "26"),
+        ai("iph1fbef4daa", "26"),
+        ai("iphc259d0ac7", "26"),
+        ai("iph6e7d349d1", "26"),
+        ai("iph83aad8922", "26"),
+        ai("iph3e2e4367", "26"),
+      ] },
+    { id: "pub-iphone-ios18", name: "아이폰 iOS 18 사용 설명서", emoji: "📱", category: "애플 아이폰",
+      description: "Apple iPhone iOS 18 공식 사용 설명서 - 설정, 카메라, 배터리, Safari, Siri, 접근성 등",
+      urls: [
+        ai("welcome", "18.0"),
+        ai("iph9374b7411", "18.0"),
+        ai("iph1fd7e482f", "18.0"),
+        ai("iph263472f78", "18.0"),
+        ai("iph63eecc618", "18.0"),
+        ai("iph3d039b67", "18.0"),
+        ai("iph1fbef4daa", "18.0"),
+        ai("iphc259d0ac7", "18.0"),
+        ai("iph6e7d349d1", "18.0"),
+        ai("iph83aad8922", "18.0"),
+        ai("iph3e2e4367", "18.0"),
+      ] },
+    { id: "pub-iphone-ios17", name: "아이폰 iOS 17 사용 설명서", emoji: "📱", category: "애플 아이폰",
+      description: "Apple iPhone iOS 17 공식 사용 설명서 - 설정, 카메라, 배터리, Safari, Siri, 접근성 등",
+      urls: [
+        ai("welcome", "17.0"),
+        ai("iph9374b7411", "17.0"),
+        ai("iph1fd7e482f", "17.0"),
+        ai("iph263472f78", "17.0"),
+        ai("iph63eecc618", "17.0"),
+        ai("iph3d039b67", "17.0"),
+        ai("iph1fbef4daa", "17.0"),
+        ai("iphc259d0ac7", "17.0"),
+        ai("iph6e7d349d1", "17.0"),
+        ai("iph83aad8922", "17.0"),
+        ai("iph3e2e4367", "17.0"),
+      ] },
+    { id: "pub-iphone-ios16", name: "아이폰 iOS 16 사용 설명서", emoji: "📱", category: "애플 아이폰",
+      description: "Apple iPhone iOS 16 공식 사용 설명서 - 설정, 카메라, 배터리, Safari, Siri, 접근성 등",
+      urls: [
+        ai("welcome", "16.0"),
+        ai("iph9374b7411", "16.0"),
+        ai("iph1fd7e482f", "16.0"),
+        ai("iph263472f78", "16.0"),
+        ai("iph63eecc618", "16.0"),
+        ai("iph3d039b67", "16.0"),
+        ai("iph1fbef4daa", "16.0"),
+        ai("iphc259d0ac7", "16.0"),
+        ai("iph6e7d349d1", "16.0"),
+        ai("iph83aad8922", "16.0"),
+        ai("iph3e2e4367", "16.0"),
+      ] },
+  ];
+
   carGroups.forEach((g, i) => {
     g.isFeatured = true;
     g.featuredOrder = 10 + i;
     g.createdAt = now;
   });
+  iphoneGroups.forEach((g, i) => {
+    g.isFeatured = true;
+    g.featuredOrder = 100 + i;
+    g.createdAt = now;
+  });
 
-  const allGroups = [...nonCar, ...carGroups];
+  const allGroups = [...nonCar, ...carGroups, ...iphoneGroups];
 
   const hyundai = carGroups.filter(g => g.category.startsWith("현대"));
   const kia = carGroups.filter(g => g.category.startsWith("기아"));
   console.log(`Non-car groups kept: ${nonCar.length}`);
   console.log(`현대: ${hyundai.length}개 그룹, ${hyundai.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`기아: ${kia.length}개 그룹, ${kia.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
+  console.log(`아이폰: ${iphoneGroups.length}개 그룹, ${iphoneGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
   console.log(`Total: ${allGroups.length}개 그룹, ${allGroups.reduce((s,g)=>s+g.urls.length,0)}개 URL`);
 
   await r.set("chatdocs:public:groups", JSON.stringify(allGroups));

@@ -17,7 +17,7 @@ const EXAMPLES: Example[] = [
     title: "아이폰 뒷면 탭",
     description: "뒷면 탭 동작 설정하는 방법",
     query: "아이폰 뒷면 탭 동작 설정하는 방법을 알려줘",
-    groupId: "pub-iphone",
+    groupId: "pub-iphone-ios26",
   },
   {
     emoji: "🚗",
