@@ -22,7 +22,7 @@ const PS = "https://www.playstation.com/ko-kr/support";
 async function main() {
   const existing = await r.get("chatdocs:public:groups");
   const old = existing ? (typeof existing === "string" ? JSON.parse(existing) : existing) : [];
-  const nonCar = old.filter(g => ["pub-macbook","pub-lgtv"].includes(g.id));
+  const nonCar = old.filter(g => ["pub-lgtv"].includes(g.id));
 
   const now = new Date().toISOString();
   const carGroups = [

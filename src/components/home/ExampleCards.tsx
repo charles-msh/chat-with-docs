@@ -31,7 +31,7 @@ const EXAMPLES: Example[] = [
     title: "맥북 배터리 관리",
     description: "배터리 수명 늘리는 설정법",
     query: "맥북 배터리 수명을 늘리는 설정 방법을 알려줘",
-    groupId: "pub-macbook",
+    groupId: "pub-mac-26",
   },
   {
     emoji: "📺",
